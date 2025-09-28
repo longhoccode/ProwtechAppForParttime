@@ -52,14 +52,14 @@ function UserDetailPage() {
 
   return (
     <div className="container">
-      <Link to="/users" className="btn btn-outline btn-sm mb-3">
-        &larr; Quay lại danh sách
+      <Link to="/campaigns" className="btn btn-outline btn-sm link">
+        &larr; Quay lại danh sách chiến dịch
       </Link>
 
       <div className="detail-page">
         {/* Sidebar */}
-        <aside className="detail-sidebar">
-          <div className="card text-center">
+        <div className="detail-sidebar">
+          <div className="card">
             <div className="card-body">
               <div className="avatar mb-3">
                 {user.full_name ? user.full_name[0] : "?"}
@@ -80,7 +80,7 @@ function UserDetailPage() {
               ))}
             </div>
           </div>
-        </aside>
+        </div>
 
         {/* Main Content */}
         <main className="detail-main">

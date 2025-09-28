@@ -1,20 +1,36 @@
-import React, { useState, useEffect } from "react";
+// src/components/AssignStoreModal.jsx
+import React, { useState, useEffect, useMemo } from "react";
 import BaseModal from "../BaseModal";
+import FilterBar from "../FilterBar";
 import api from "../../services/api";
+import { provinces, districtMap } from "../../constants/locationData";
 
-function AssignStoreModal({ isOpen, onClose, onSave, campaignId, initiallyAssignedIds }) {
+function AssignStoreModal({
+  isOpen,
+  onClose,
+  onSave,
+  campaignId,
+  initiallyAssignedIds,
+}) {
   const [allStores, setAllStores] = useState([]);
   const [selectedStoreIds, setSelectedStoreIds] = useState(new Set());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
+
+  // Filter state
+  const [filters, setFilters] = useState({
+    province: "all",
+    district: "",
+    search: "",
+  });
 
   useEffect(() => {
     if (isOpen) {
-      setSearchTerm("");
+      setFilters({ search: "", province: "all", district: "" });
       setLoading(true);
       setError("");
-      api.get("/stores")
+      api
+        .get("/stores")
         .then((res) => {
           setAllStores(res.data.data || []);
           setSelectedStoreIds(new Set(initiallyAssignedIds));
@@ -35,16 +51,23 @@ function AssignStoreModal({ isOpen, onClose, onSave, campaignId, initiallyAssign
   const handleSave = async () => {
     const orig = new Set(initiallyAssignedIds);
     const curr = selectedStoreIds;
-    const add = [...curr].filter(id => !orig.has(id));
-    const remove = [...orig].filter(id => !curr.has(id));
+
+    // danh sách cần thêm & xóa
+    const add = [...curr].filter((id) => !orig.has(id));
+    const remove = [...orig].filter((id) => !curr.has(id));
+
+    if (add.length === 0 && remove.length === 0) {
+      onClose(); // không thay đổi thì chỉ đóng modal
+      return;
+    }
 
     setLoading(true);
     setError("");
     try {
-      await Promise.all([
-        ...add.map(id => api.post(`/campaigns/${campaignId}/stores`, { store_id: id })),
-        ...remove.map(id => api.delete(`/campaigns/${campaignId}/stores/${id}`))
-      ]);
+      await api.post(`/campaigns/${campaignId}/stores/bulk`, {
+        addIds: add,
+        removeIds: remove,
+      });
       onSave();
     } catch {
       setError("Lưu thay đổi thất bại.");
@@ -53,41 +76,149 @@ function AssignStoreModal({ isOpen, onClose, onSave, campaignId, initiallyAssign
     }
   };
 
-  const filteredStores = allStores.filter(store =>
-    `${store.board_name || ""} ${store.store_code || ""} ${store.address || ""}`.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // ✅ helpers: map code -> label
+  const getProvinceLabel = (code) =>
+    provinces.find((p) => p.value === code)?.label || code;
+
+  const getDistrictLabel = (provinceCode, districtCode) =>
+    districtMap[provinceCode]?.find((d) => d.value === districtCode)?.label ||
+    districtCode;
+
+  // District options theo province
+  const districtOptions =
+    filters.province && filters.province !== "all"
+      ? districtMap[filters.province] || []
+      : [];
+
+  // Filter config cho FilterBar
+  const filterConfig = [
+    {
+      name: "search",
+      label: "Tìm kiếm",
+      type: "text",
+      placeholder: "Mã, tên hoặc địa chỉ...",
+    },
+    {
+      name: "province",
+      label: "Tỉnh/Thành phố",
+      type: "select",
+      options: [{ value: "all", label: "Tất cả" }, ...provinces],
+    },
+    {
+      name: "district",
+      label: "Quận/Huyện",
+      type: "select",
+      options: [{ value: "", label: "Tất cả" }, ...districtOptions],
+    },
+  ];
+
+  // Lọc danh sách store
+  const filteredStores = useMemo(() => {
+    return allStores.filter((store) => {
+      const matchProvince =
+        filters.province === "all" || store.district === filters.province;
+      const matchDistrict = filters.district
+        ? store.district_raw === filters.district
+        : true;
+      const text = `${store.board_name || ""} ${store.store_code || ""} ${
+        store.address || ""
+      }`.toLowerCase();
+      const matchSearch = text.includes(filters.search.toLowerCase());
+      return matchProvince && matchDistrict && matchSearch;
+    });
+  }, [allStores, filters]);
+
+  // Select all / deselect all
+  const handleSelectAll = () => {
+    setSelectedStoreIds((prev) => {
+      const copy = new Set(prev);
+      filteredStores.forEach((s) => copy.add(s.id));
+      return copy;
+    });
+  };
+
+  const handleDeselectAll = () => {
+    setSelectedStoreIds((prev) => {
+      const copy = new Set(prev);
+      filteredStores.forEach((s) => copy.delete(s.id));
+      return copy;
+    });
+  };
 
   return (
-
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
       title="Phân công cửa hàng cho chiến dịch"
       actions={
         <>
-          <button className="btn btn-danger btn-sm" onClick={onClose} disabled={loading}>Hủy</button>
-          <button className="btn btn-primary btn-sm" onClick={handleSave} disabled={loading}>{loading ? "Đang lưu..." : "Lưu thay đổi"}</button>
+          <div className="modal-actions-button">
+            <button
+              className="btn btn-danger btn-sm"
+              onClick={handleDeselectAll}
+              disabled={loading}
+            >
+              Bỏ chọn tất cả
+            </button>
+            <button
+              className="btn btn-success btn-sm"
+              onClick={handleSelectAll}
+              disabled={loading}
+            >
+              Chọn tất cả
+            </button>
+            <div>
+              Đã chọn: {selectedStoreIds.size} / {allStores.length}
+            </div>
+          </div>
+          <div className="modal-actions-button">
+            <button
+              className="btn btn-danger btn-sm"
+              onClick={onClose}
+              disabled={loading}
+            >
+              Hủy
+            </button>
+            <button
+              className="btn btn-primary btn-sm"
+              onClick={handleSave}
+              disabled={loading}
+            >
+              {loading ? "Đang lưu..." : "Lưu thay đổi"}
+            </button>
+          </div>
         </>
       }
     >
       {error && <p className="alert alert-error">{error}</p>}
 
-      <div className="modal-row">
-        <input
-          type="text"
-          placeholder="Tìm kiếm..."
-          className="form-control"
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
-        />
-      </div>
+      {/* FilterBar */}
+      <FilterBar
+        filters={filterConfig}
+        values={filters}
+        onChange={(name, value) =>
+          setFilters((prev) => ({ ...prev, [name]: value }))
+        }
+        onReset={() =>
+          setFilters({ search: "", province: "all", district: "" })
+        }
+      />
 
-      <div className="modal-content" style={{ maxHeight: "300px", overflowY: "auto" }}>
-        {filteredStores.map(store => (
+      {/* Store list */}
+      <div className="modal-content">
+        {filteredStores.map((store) => (
           <label key={store.id} className="modal-row">
-            <input type="checkbox" checked={selectedStoreIds.has(store.id)} onChange={() => handleToggleStore(store.id)} />
+            <input
+              type="checkbox"
+              checked={selectedStoreIds.has(store.id)}
+              onChange={() => handleToggleStore(store.id)}
+            />
             <div className="modal-label">{store.store_code}</div>
-            <div className="modal-value">{store.address}</div>
+            <div className="modal-value" id="address">{store.address}</div>
+            <div className="modal-value">
+              {getDistrictLabel(store.district, store.district_raw)}
+            </div>
+            <div className="modal-value">{getProvinceLabel(store.district)}</div>
           </label>
         ))}
       </div>

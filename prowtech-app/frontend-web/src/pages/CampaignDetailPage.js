@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import AssignStoreModal from '../components/modal/AssignStoreModal';
 import LoadingMessage from '../components/LoadingMessage';
@@ -9,7 +9,6 @@ import DataTable from '../components/DataTable';
 import FilterBar from '../components/FilterBar';
 import { provinces, districtMap } from '../constants/locationData';
 
-const formatDate = (dateStr) => (dateStr ? new Date(dateStr).toLocaleDateString('vi-VN') : 'N/A');
 
 function CampaignDetailPage() {
   const { id } = useParams();
@@ -74,6 +73,9 @@ function CampaignDetailPage() {
 
   return (
     <div className="container detail-page">
+      <Link to="/campaigns" className="btn btn-outline btn-sm link">
+          &larr; Quay lại danh sách
+      </Link>
       <div className="page-header">
         <h2 className="page-title">Cửa hàng ({assignedStores.length})</h2>
         <button className="btn btn-primary btn-sm" onClick={() => setIsModalOpen(true)}>
@@ -120,13 +122,31 @@ function CampaignDetailPage() {
             { label: 'Store Code' },
             { label: 'Address' },
             { label: 'District' },
+            { label: 'Link Drive' }, // thêm cột mới
           ]}
           data={filteredStores}
           renderRow={(store) => (
             <tr key={store.id}>
               <td>{store.store_code}</td>
               <td id="address">{store.address}</td>
-              <td>{districtMap[store.district]?.find((d) => d.value === store.district_raw)?.label || store.district_raw}</td>
+              <td>
+                {districtMap[store.district]?.find((d) => d.value === store.district_raw)?.label ||
+                  store.district_raw}
+              </td>
+              <td>
+                {store.drive_folder_id? (
+                  <a
+                    href={store.drive_folder_id}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 underline"
+                  >
+                    Mở Link
+                  </a>
+                ) : (
+                  <span className="text-gray-400">Chưa có</span>
+                )}
+              </td>
             </tr>
           )}
         />

@@ -66,16 +66,16 @@ function StoreMapPage() {
   // Build filters dynamically
   const filters = useMemo(() => {
     const baseFilters = [
-      { name: "board", label: "Chuỗi", type: "select", options: ["Tất cả", ...boardOptions] },
+      { name: "board", label: "Chain", type: "select", options: ["Tất cả", ...boardOptions] },
       {
         name: "campaign",
-        label: "Chiến dịch",
+        label: "Campaign",
         type: "select",
         options: [{ value: "all", label: "Tất cả" }, ...campaigns.map(c => ({ value: c.id, label: c.name }))],
       },
       {
         name: "district",
-        label: "Tỉnh/Thành phố",
+        label: "Provinces",
         type: "select",
         options: [{ value: "all", label: "Tất cả" }, ...provinces.map(p => ({ value: p.value, label: p.label }))],
       },
@@ -85,7 +85,7 @@ function StoreMapPage() {
     if (filterValues.district !== "all") {
       baseFilters.push({
         name: "districtRaw",
-        label: "Quận/Huyện",
+        label: "District",
         type: "select",
         options: [
           { value: "all", label: "Tất cả" },
@@ -130,7 +130,7 @@ function StoreMapPage() {
       <FilterBar filters={filters} values={filterValues} onChange={handleFilterChange} />
       <button className="btn btn-primary btn-lg mt-2" onClick={handleReset}>Reset</button>
 
-      <div className="map-container" style={{ height: "600px", marginTop: "16px" }}>
+      <div className="map-container">
         <GoogleMap
           mapContainerStyle={MAP_CONTAINER_STYLE}
           center={DEFAULT_CENTER}

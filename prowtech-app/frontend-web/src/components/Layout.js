@@ -11,7 +11,10 @@ import {
   faMapMarkedAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "../context/AuthContext";
-import "../styles/layout.css";
+import "../assets/styles/layout.css";
+
+// ✅ Import logo chuẩn
+import logo from "../assets/img/logo.png";
 
 function Layout() {
   const { user, logout } = useAuth();
@@ -25,6 +28,7 @@ function Layout() {
     { to: "/store-map", icon: faMapMarkedAlt, label: "Store Map" },
     { to: "/stores", icon: faStore, label: "Stores" },
     { to: "/users", icon: faUsers, label: "Users" },
+    { to: "/staffs", icon: faUsers, label: "Staffs" },
     { to: "/campaigns", icon: faBullhorn, label: "Campaigns" },
   ];
 
@@ -36,6 +40,7 @@ function Layout() {
       {/* Sidebar */}
       <div className="sidebar">
         <div className="sidebar-header">
+          <img src={logo} alt="Logo"/>
           <h2>My Dashboard</h2>
         </div>
 
@@ -68,8 +73,7 @@ function Layout() {
 
       {/* Main Content */}
       <div className="main-content">
-        {/* Topbar */}
-        {/* Topbar chỉ mobile */}
+        {/* Topbar (chỉ mobile) */}
         <div className="topbar mobile-only">
           <button className="btn-toggle" onClick={toggleSidebar}>
             <FontAwesomeIcon icon={faBars} />
@@ -79,6 +83,7 @@ function Layout() {
             <span>Hi, {user?.full_name || "Guest"}</span>
           </div>
         </div>
+
         {/* Page Body */}
         <main>
           <Outlet />

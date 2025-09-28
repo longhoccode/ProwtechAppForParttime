@@ -1,7 +1,7 @@
 // src/components/BaseModal.jsx
 import React from "react";
 import ReactDOM from "react-dom";
-import "../styles/BaseModal.css";
+import "../assets/styles/BaseModal.css";
 
 function BaseModal({ isOpen, onClose, title, children, actions }) {
   if (!isOpen) return null;

@@ -160,7 +160,7 @@ function CampaignListPage() {
           renderRow={(campaign) => (
             <tr key={campaign.id}>
               <td>
-                <Link to={`/campaigns/${campaign.id}`} className="table-link">
+                <Link to={`/campaigns/${campaign.id}`} className="link">
                   {campaign.name}
                 </Link>
               </td>
@@ -178,19 +178,22 @@ function CampaignListPage() {
                   {campaign.is_active ? "Active" : "Inactive"}
                 </span>
               </td>
-              <td className="table-actions">
-                <button
-                  className="btn btn-outline btn-sm"
-                  onClick={() => handleOpenEditModal(campaign)}
-                >
-                  Edit
-                </button>
-                <button
-                  className="btn btn-danger btn-sm"
-                  onClick={() => handleDeleteCampaign(campaign)}
-                >
-                  Delete
-                </button>
+              <td>
+                <div className="table-actions">
+                  <button
+                    className="btn btn-outline btn-sm"
+                    onClick={() => handleOpenEditModal(campaign)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => handleDeleteCampaign(campaign)}
+                  >
+                    Delete
+                  </button>
+                </div>
+
               </td>
             </tr>
           )}

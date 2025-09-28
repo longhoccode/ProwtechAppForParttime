@@ -130,7 +130,7 @@ function UserListPage() {
           renderRow={(user) => (
             <tr key={user.id}>
               <td>
-                <Link to={`/users/${user.id}`} className="table-link">
+                <Link to={`/users/${user.id}`} className="link">
                   {user.full_name}
                 </Link>
               </td>

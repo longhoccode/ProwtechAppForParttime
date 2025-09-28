@@ -109,8 +109,8 @@ function StoreListPage() {
             { label: "Store Chain" },
             { label: "Store Code" },
             { label: "Address" },
-            { label: "Province" },
             { label: "District" },
+            { label: "Province" },
             { label: "Status" },
             { label: "Actions", className: "table-actions" },
           ]}
@@ -120,20 +120,22 @@ function StoreListPage() {
               <td>{store.board_name}</td>
               <td>{store.store_code}</td>
               <td id="address">{store.address}</td>
-              <td>{store.district}</td>
               <td>{districtMap[store.district]?.find((d) => d.value === store.district_raw)?.label || store.district_raw}</td>
+              <td>{store.district}</td>             
               <td>
                 <span className={`badge ${store.is_active ? "badge-success" : "badge-error"}`}>
                   {store.is_active ? "Active" : "Inactive"}
                 </span>
               </td>
-              <td className="table-actions">
-                <button
-                  className="btn btn-outline btn-sm"
-                  onClick={() => handleOpenModal(store)}
-                >
-                  View
-                </button>
+              <td>
+                <div className="table-actions">
+                  <button
+                    className="btn btn-outline btn-sm"
+                    onClick={() => handleOpenModal(store)}
+                  >
+                    View
+                  </button>
+                </div>
               </td>
             </tr>
           )}

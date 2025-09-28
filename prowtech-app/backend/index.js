@@ -10,7 +10,7 @@ const storeRoutes = require('./routes/storeRoutes');
 const authRoutes = require('./routes/authRoutes'); 
 const userRoutes = require('./routes/userRoutes'); 
 const campaignRoutes = require('./routes/campaignRoutes');
-
+const staffRoutes = require('./routes/staffRoutes')
 // Middlewares
 app.use(cors());
 app.use(express.json());
@@ -24,7 +24,8 @@ app.get('/', (req, res) => {
 app.use('/api/stores', storeRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/campaigns', campaignRoutes);  
+app.use('/api/campaigns', campaignRoutes); 
+app.use('/api/staffs', staffRoutes);
 
 app.listen(PORT, '192.168.1.8', () => {
   console.log(`Server running on port ${PORT}`);

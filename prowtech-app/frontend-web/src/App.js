@@ -8,8 +8,10 @@ import LoginPage from './pages/LoginPage';
 import DashBoardPage from './pages/DashBoardPage'; 
 import StoreListPage from './pages/StoreListPage';
 import UserListPage from './pages/UserListPage';
-import UserProfilePage from './pages/UserDetailPage';
+import UserDetailPage from './pages/UserDetailPage';
 import StoreMapPage from "./pages/StoreMapPage";
+import StaffListPage from "./pages/StaffListPage";
+import StaffDetailPage from "./pages/StaffDetailPage"
 
 
 // Import Campaign pages
@@ -41,7 +43,11 @@ function App() {
 
             {/* Users */}
             <Route path="users" element={<UserListPage />} />
-            <Route path="users/:id" element={<UserProfilePage />} />
+            <Route path="users/:id" element={<UserDetailPage />} />
+
+            {/* Staffs */}
+            <Route path="staffs" element={<StaffListPage />} />
+            <Route path="staffs/:id" element={<StaffDetailPage />} />
 
             {/* Campaigns */}
             <Route path="campaigns" element={<CampaignListPage />} />
