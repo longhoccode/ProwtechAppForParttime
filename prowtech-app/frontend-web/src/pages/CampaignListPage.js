@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
-import CampaignForm from "../components/CampaignForm";
+import CampaignForm from "../components/modal/CampaignDetailModal";
 import LoadingMessage from "../components/LoadingMessage";
 import ErrorMessage from "../components/ErrorMessage";
 import DataTable from "../components/DataTable";
@@ -110,7 +110,7 @@ function CampaignListPage() {
   return (
     <div className="container">
       {/* Header */}
-      <div className="page-header flex-between">
+      <div className="page-header">
         <h2 className="page-title">Campaign Management</h2>
         <button onClick={handleOpenCreateModal} className="btn btn-primary btn-lg">
           + Add New Campaign
@@ -171,7 +171,7 @@ function CampaignListPage() {
               <td>{new Date(campaign.end_date).toLocaleDateString("vi-VN")}</td>
               <td>
                 <span
-                  className={`status-badge ${
+                  className={`status ${
                     campaign.is_active ? "status-active" : "status-inactive"
                   }`}
                 >

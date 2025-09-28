@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
-import UserDetailModal from "../components/UserDetailModal";
+import UserDetailModal from "../components/modal/UserDetailModal";
 import DataTable from "../components/DataTable";
 import LoadingMessage from "../components/LoadingMessage";
 import ErrorMessage from "../components/ErrorMessage";
@@ -137,7 +137,7 @@ function UserListPage() {
               <td>{user.email}</td>
               <td>{user.role}</td>
               <td>
-                <span className={`status ${user.is_active ? "status-active" : "status-inactive"}`}>
+                <span className={`badge ${user.is_active ? "badge-success" : "badge-error"}`}>
                   {user.is_active ? "Active" : "Inactive"}
                 </span>
               </td>

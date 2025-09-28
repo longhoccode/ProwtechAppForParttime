@@ -8,14 +8,13 @@ import LoginPage from './pages/LoginPage';
 import DashBoardPage from './pages/DashBoardPage'; 
 import StoreListPage from './pages/StoreListPage';
 import UserListPage from './pages/UserListPage';
-import UserProfilePage from './pages/UserProfilePage';
+import UserProfilePage from './pages/UserDetailPage';
 import StoreMapPage from "./pages/StoreMapPage";
 
 
 // Import Campaign pages
 import CampaignListPage from './pages/CampaignListPage';
 import CampaignDetailPage from './pages/CampaignDetailPage';
-import CampaignForm from './components/CampaignForm';
 
 function App() {
   return (
@@ -46,9 +45,7 @@ function App() {
 
             {/* Campaigns */}
             <Route path="campaigns" element={<CampaignListPage />} />
-            <Route path="campaigns/new" element={<CampaignForm />} />
             <Route path="campaigns/:id" element={<CampaignDetailPage />} />
-            <Route path="campaigns/:id/edit" element={<CampaignForm />} />
           </Route>
         </Routes>
       </Router>

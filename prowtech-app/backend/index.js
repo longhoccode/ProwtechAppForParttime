@@ -26,6 +26,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/campaigns', campaignRoutes);  
 
-app.listen(PORT, '192.168.1.23', () => {
+app.listen(PORT, '192.168.1.8', () => {
   console.log(`Server running on port ${PORT}`);
 });

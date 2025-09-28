@@ -1,37 +1,43 @@
-// File: CampaignDetailPage.jsx
-import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useParams } from 'react-router-dom';
 import api from '../services/api';
-import AssignStoreModal from '../components/AssignStoreModal';
+import AssignStoreModal from '../components/modal/AssignStoreModal';
 import LoadingMessage from '../components/LoadingMessage';
 import ErrorMessage from '../components/ErrorMessage';
 import EmptyState from '../components/EmptyState';
+import DataTable from '../components/DataTable';
+import FilterBar from '../components/FilterBar';
+import { provinces, districtMap } from '../constants/locationData';
 
-// Helper format date
-const formatDate = (dateStr) => {
-  if (!dateStr) return 'N/A';
-  return new Date(dateStr).toLocaleDateString('vi-VN');
-};
+const formatDate = (dateStr) => (dateStr ? new Date(dateStr).toLocaleDateString('vi-VN') : 'N/A');
 
 function CampaignDetailPage() {
+  const { id } = useParams();
   const [campaign, setCampaign] = useState(null);
   const [assignedStores, setAssignedStores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const { id } = useParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Filter state
+  const [filters, setFilters] = useState({
+    province: '',
+    district: '',
+    search: '',
+  });
+
   const fetchData = useCallback(async () => {
+    setLoading(true);
     try {
-      setLoading(true);
       const [campaignRes, storesRes] = await Promise.all([
         api.get(`/campaigns/${id}`),
         api.get(`/campaigns/${id}/stores`),
       ]);
       setCampaign(campaignRes.data.data);
       setAssignedStores(storesRes.data.data || []);
-    } catch (err) {
-      setError('Failed to fetch campaign details.');
+      setError('');
+    } catch {
+      setError('Không thể tải thông tin chiến dịch.');
     } finally {
       setLoading(false);
     }
@@ -46,88 +52,89 @@ function CampaignDetailPage() {
     fetchData();
   };
 
-  if (loading) return <LoadingMessage message="Loading campaign..." />;
-  if (error) return <ErrorMessage message={error} />;
-  if (!campaign) return <EmptyState message="Campaign not found." />;
+  // District options based on selected province
+  const districtOptions = filters.province ? districtMap[filters.province] || [] : [];
+
+  // Filtered stores
+  const filteredStores = useMemo(() => {
+    return assignedStores.filter((store) => {
+      const matchProvince = filters.province ? store.district === filters.province : true;
+      const matchDistrict = filters.district ? store.district_raw === filters.district : true;
+      const matchSearch =
+        (store.board_name || '').toLowerCase().includes(filters.search.toLowerCase()) ||
+        (store.store_code || '').toLowerCase().includes(filters.search.toLowerCase()) ||
+        (store.address || '').toLowerCase().includes(filters.search.toLowerCase());
+      return matchProvince && matchDistrict && matchSearch;
+    });
+  }, [assignedStores, filters]);
+
+  if (loading) return <LoadingMessage text="Đang tải chiến dịch..." />;
+  if (error) return <ErrorMessage text={error} />;
+  if (!campaign) return <EmptyState message="Chiến dịch không tồn tại." />;
 
   return (
-    <div className="container">
-      <Link to="/campaigns" className="btn-link back-link">
-        &larr; Back to Campaign List
-      </Link>
-
-      <div className="profile-page">
-        {/* Sidebar */}
-        <aside className="profile-sidebar">
-          {/* Campaign Info */}
-          <div className="card">
-            <div className="card-body text-center">
-              <div className="profile-avatar">📢</div>
-              <h3 className="profile-title">{campaign.name}</h3>
-              <div className="profile-status">
-                <span
-                  className={`status-badge ${
-                    campaign.is_active ? 'status-active' : 'status-inactive'
-                  }`}
-                >
-                  {campaign.is_active ? 'Active' : 'Inactive'}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Campaign Details */}
-          <div className="card">
-            <div className="card-header">
-              <h4 className="card-title">Details</h4>
-            </div>
-            <div className="card-body">
-              <div className="detail-list">
-                <div className="detail-row">
-                  <div className="detail-label">Description</div>
-                  <div className="detail-value">{campaign.description || 'N/A'}</div>
-                </div>
-                <div className="detail-row">
-                  <div className="detail-label">Start Date</div>
-                  <div className="detail-value">{formatDate(campaign.start_date)}</div>
-                </div>
-                <div className="detail-row">
-                  <div className="detail-label">End Date</div>
-                  <div className="detail-value">{formatDate(campaign.end_date)}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </aside>
-
-        {/* Main Content */}
-        <main className="profile-main">
-          <div className="card">
-            <div className="card-header flex-between">
-              <h4 className="card-title">
-                Stores in Campaign ({assignedStores.length})
-              </h4>
-              <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
-                Manage Stores
-              </button>
-            </div>
-            <div className="card-body" id="store-list">
-              {assignedStores.length > 0 ? (
-                <ul className="card-list">
-                  {assignedStores.map((store) => (
-                    <li key={store.id} className="card-item">
-                      <strong>{store.store_code}</strong> - {store.address}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <EmptyState message="No stores have been assigned yet." />
-              )}
-            </div>
-          </div>
-        </main>
+    <div className="container detail-page">
+      <div className="page-header">
+        <h2 className="page-title">Cửa hàng ({assignedStores.length})</h2>
+        <button className="btn btn-primary btn-sm" onClick={() => setIsModalOpen(true)}>
+          Quản lý cửa hàng
+        </button>
       </div>
 
+      {/* FilterBar */}
+      <FilterBar
+        filters={[
+          {
+            name: 'province',
+            type: 'select',
+            label: 'Province',
+            options: [{ value: '', label: 'Tỉnh/TP' }, ...provinces],
+          },
+          {
+            name: 'district',
+            type: 'select',
+            label: 'District',
+            options: [{ value: '', label: 'Quận/Huyện' }, ...districtOptions],
+          },
+          {
+            name: 'search',
+            type: 'text',
+            label: 'Search',
+            placeholder: 'Name, code, or address...',
+          },
+        ]}
+        values={filters}
+        onChange={(name, value) =>
+          setFilters((prev) => ({
+            ...prev,
+            [name]: value,
+            ...(name === 'province' ? { district: '' } : {}),
+          }))
+        }
+      />
+
+      {/* DataTable */}
+      {filteredStores.length > 0 ? (
+        <DataTable
+          columns={[
+            { label: 'Store Code' },
+            { label: 'Address' },
+            { label: 'District' },
+          ]}
+          data={filteredStores}
+          renderRow={(store) => (
+            <tr key={store.id}>
+              <td>{store.store_code}</td>
+              <td id="address">{store.address}</td>
+              <td>{districtMap[store.district]?.find((d) => d.value === store.district_raw)?.label || store.district_raw}</td>
+            </tr>
+          )}
+        />
+      ) : (
+        <EmptyState message="Không có cửa hàng nào phù hợp với bộ lọc." />
+      )}
+
+      {/* Assign Store Modal */}
       <AssignStoreModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

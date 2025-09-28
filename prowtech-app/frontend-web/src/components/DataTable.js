@@ -4,13 +4,11 @@ import React from "react";
 function DataTable({ columns, data, renderRow }) {
   return (
     <div className="table-wrapper">
-      <table className="data-table">
+      <table>
         <thead>
           <tr>
             {columns.map((col, idx) => (
-              <th key={idx} className={col.className || ""}>
-                {col.label}
-              </th>
+              <th key={idx} scope="col">{col.label}</th>
             ))}
           </tr>
         </thead>
@@ -29,5 +27,6 @@ function DataTable({ columns, data, renderRow }) {
     </div>
   );
 }
+
 
 export default DataTable;

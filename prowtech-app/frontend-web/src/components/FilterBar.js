@@ -1,20 +1,20 @@
-// File: FilterBar.jsx
+// src/components/FilterBar.jsx
 import React from "react";
 
-function FilterBar({ filters, values, onChange }) {
+function FilterBar({ filters, values, onChange, onReset }) {
   return (
     <div className="filter-bar">
       {filters.map((filter) => (
         <div className="filter-item" key={filter.name}>
           <label htmlFor={filter.name}>{filter.label}</label>
-
           {filter.type === "select" ? (
             <select
               id={filter.name}
               className="form-control"
-              value={values[filter.name] || ""}
+              value={values[filter.name] || "all"}
               onChange={(e) => onChange(filter.name, e.target.value)}
             >
+              <option value="all">Tất cả</option>
               {filter.options?.map((opt) =>
                 typeof opt === "string" ? (
                   <option key={opt} value={opt}>
@@ -39,6 +39,11 @@ function FilterBar({ filters, values, onChange }) {
           ) : null}
         </div>
       ))}
+      {onReset && (
+        <button className="btn btn-primary btn-lg" onClick={onReset}>
+          Reset
+        </button>
+      )}
     </div>
   );
 }

@@ -34,7 +34,7 @@ function Layout() {
       {sidebarOpen && <div className="sidebar-overlay" onClick={closeSidebar} />}
 
       {/* Sidebar */}
-      <aside className="sidebar">
+      <div className="sidebar">
         <div className="sidebar-header">
           <h2>My Dashboard</h2>
         </div>
@@ -64,7 +64,7 @@ function Layout() {
             Logout
           </button>
         </div>
-      </aside>
+      </div>
 
       {/* Main Content */}
       <div className="main-content">
@@ -80,7 +80,7 @@ function Layout() {
           </div>
         </div>
         {/* Page Body */}
-        <main className="content">
+        <main>
           <Outlet />
         </main>
       </div>

@@ -1,7 +1,7 @@
 // File: StoreListPage.jsx
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import api from "../services/api";
-import StoreDetailModal from "../components/StoreDetailModal";
+import StoreDetailModal from "../components/modal/StoreDetailModal";
 import DataTable from "../components/DataTable";
 import LoadingMessage from "../components/LoadingMessage";
 import ErrorMessage from "../components/ErrorMessage";
@@ -64,7 +64,7 @@ function StoreListPage() {
 
   return (
     <div className="container">
-      <div className="page-header flex-between">
+      <div className="page-header">
         <h2 className="page-title">Store Management</h2>
       </div>
 
@@ -117,15 +117,13 @@ function StoreListPage() {
           data={filteredStores}
           renderRow={(store) => (
             <tr key={store.id}>
-              <td className="desktop-only">{store.board_name}</td>
+              <td>{store.board_name}</td>
               <td>{store.store_code}</td>
-              <td className="desktop-only" id="address">{store.address}</td>
-              <td className="desktop-only">{store.district}</td>
-              <td className="desktop-only">{districtMap[store.district]?.find((d) => d.value === store.district_raw)?.label || store.district_raw}</td>
-              <td className="desktop-only">
-                <span
-                  className={`status ${store.is_active ? "status-active" : "status-inactive"}`}
-                >
+              <td id="address">{store.address}</td>
+              <td>{store.district}</td>
+              <td>{districtMap[store.district]?.find((d) => d.value === store.district_raw)?.label || store.district_raw}</td>
+              <td>
+                <span className={`badge ${store.is_active ? "badge-success" : "badge-error"}`}>
                   {store.is_active ? "Active" : "Inactive"}
                 </span>
               </td>

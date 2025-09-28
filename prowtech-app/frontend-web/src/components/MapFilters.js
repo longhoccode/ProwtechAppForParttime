@@ -87,10 +87,7 @@ function MapFilters({
           </select>
         </div>
       )}
-      {/* Reset */}
-      <button className="btn btn-primary btn-lg" onClick={handleReset}>
-        Reset
-      </button>
+    <button className="btn btn-primary btn-lg" onClick={handleReset}>Reset</button>
     </div>
   );
 }
