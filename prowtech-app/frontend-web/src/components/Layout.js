@@ -13,7 +13,6 @@ import {
 import { useAuth } from "../context/AuthContext";
 import "../assets/styles/layout.css";
 
-// ✅ Import logo chuẩn
 import logo from "../assets/img/logo.png";
 
 function Layout() {
@@ -23,24 +22,40 @@ function Layout() {
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const closeSidebar = () => setSidebarOpen(false);
 
-  const navLinks = [
-    { to: "/", icon: faTachometerAlt, label: "Dashboard" },
-    { to: "/store-map", icon: faMapMarkedAlt, label: "Store Map" },
-    { to: "/stores", icon: faStore, label: "Stores" },
-    { to: "/users", icon: faUsers, label: "Users" },
-    { to: "/staffs", icon: faUsers, label: "Staffs" },
-    { to: "/campaigns", icon: faBullhorn, label: "Campaigns" },
-  ];
+  // Config menu
+  const menus = {
+    admin: [
+      { to: "/", icon: faTachometerAlt, label: "Dashboard" },
+      { to: "/store-map", icon: faMapMarkedAlt, label: "Store Map" },
+      { to: "/stores", icon: faStore, label: "Stores" },
+      { to: "/users", icon: faUsers, label: "Users" },
+      { to: "/staffs", icon: faUsers, label: "Staffs" },
+      { to: "/campaigns", icon: faBullhorn, label: "Campaigns" },
+    ],
+    staff: [
+      { to: "/", icon: faTachometerAlt, label: "Dashboard" },
+      { to: "/store-map", icon: faMapMarkedAlt, label: "Store Map" },
+    ],
+  };
+
+  // Xác định navLinks theo role
+  const role = user?.role;
+  let navLinks = [];
+  if (role === "admin") {
+    navLinks = menus.admin;
+  } else if (role === "staff" || role === "parttime") {
+    navLinks = menus.staff;
+  }
 
   return (
     <div className={`layout-wrapper ${sidebarOpen ? "sidebar-open" : ""}`}>
-      {/* Sidebar Overlay for Mobile */}
+      {/* Sidebar Overlay (mobile) */}
       {sidebarOpen && <div className="sidebar-overlay" onClick={closeSidebar} />}
 
       {/* Sidebar */}
       <div className="sidebar">
         <div className="sidebar-header">
-          <img src={logo} alt="Logo"/>
+          <img src={logo} alt="Logo" />
           <h2>My Dashboard</h2>
         </div>
 
@@ -49,7 +64,9 @@ function Layout() {
             <li key={link.to}>
               <NavLink
                 to={link.to}
-                className="nav-link"
+                className={({ isActive }) =>
+                  `nav-link ${isActive ? "active" : ""}`
+                }
                 onClick={closeSidebar}
               >
                 <FontAwesomeIcon icon={link.icon} className="icon" />
@@ -73,7 +90,7 @@ function Layout() {
 
       {/* Main Content */}
       <div className="main-content">
-        {/* Topbar (chỉ mobile) */}
+        {/* Topbar (mobile) */}
         <div className="topbar mobile-only">
           <button className="btn-toggle" onClick={toggleSidebar}>
             <FontAwesomeIcon icon={faBars} />

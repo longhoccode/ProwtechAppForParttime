@@ -1,23 +1,25 @@
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import React from "react";
+import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
-const ProtectedRoute = ({ children }) => {
-    const { isAuthenticated, loading } = useAuth();
-    const location = useLocation();
+const ProtectedRoute = ({ children, roles }) => {
+  const { user, loading } = useAuth();
+  const location = useLocation();
 
-    if (loading) {
-        // You can add a loading spinner here
-        return <div>Loading...</div>;
-    }
+  if (loading) {
+    return <div>Loading...</div>; // spinner
+  }
 
-    if (!isAuthenticated) {
-        // Redirect them to the /login page, but save the current location they were
-        // trying to go to. This allows us to send them along to that page after they login.
-        return <Navigate to="/login" state={{ from: location }} replace />;
-    }
+  if (!user) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
 
-    return children;
+  // Check roles nếu có
+  if (roles && roles.length > 0 && !roles.includes(user.role)) {
+    return <Navigate to="/403" replace />; // trang 403 Forbidden
+  }
+
+  return children;
 };
 
 export default ProtectedRoute;
