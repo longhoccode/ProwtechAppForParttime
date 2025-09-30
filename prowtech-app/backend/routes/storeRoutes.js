@@ -13,13 +13,13 @@ const {
 const { protect, authorize } = require('../middleware/authMiddleware');
 
 // Lấy tất cả cửa hàng
-router.get('/', protect, authorize('admin'), getAllStores);
+router.get('/', protect, authorize('admin','parttime'), getAllStores);
 
 // Lấy tất cả cửa hàng theo chain
-router.get('/chain/:chain', protect, authorize('admin'), getAllStoresByChain);
+router.get('/chain/:chain', protect, authorize('admin','parttime'), getAllStoresByChain);
 
 // Lấy cửa hàng theo ID
-router.get('/:id', protect, authorize('admin'), getStoreById);
+router.get('/:id', protect, authorize('admin','parttime'), getStoreById);
 
 // Thêm mới cửa hàng
 router.post('/', protect, authorize('admin'), createStore);

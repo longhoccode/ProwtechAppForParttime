@@ -19,7 +19,7 @@ const { protect, authorize } = require('../middleware/authMiddleware');
 
 // Áp dụng middleware cho toàn bộ route
 router.use(protect);
-router.use(authorize('admin'));
+router.use(authorize('admin','parttime'));
 
 // --- Routes cho Campaign-Store Mapping ---
 // Lấy toàn bộ mapping giữa campaign và store
