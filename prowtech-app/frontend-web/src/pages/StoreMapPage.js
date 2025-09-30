@@ -127,7 +127,14 @@ function StoreMapPage() {
       if (name === "district") return { ...prev, district: value, districtRaw: "all" };
       return { ...prev, [name]: value };
     });
+
+    // Sau khi đổi filter, reset map về vị trí người dùng
+    if (mapRef.current && userLocation) {
+      mapRef.current.setCenter(userLocation);
+      mapRef.current.setZoom(12);
+    }
   };
+
 
   const filteredStores = useMemo(() => {
     return stores.filter(store => {
