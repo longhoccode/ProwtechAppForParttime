@@ -60,7 +60,7 @@ function Layout() {
         </ul>
 
         {/* Sidebar Footer */}
-        <div className="sidebar-footer desktop-only">
+        <div className="sidebar-footer">
           <div className="sidebar-user">
             <FontAwesomeIcon icon={faUserCircle} className="user-icon" />
             <span>Hi, {user?.full_name || "Guest"}</span>
