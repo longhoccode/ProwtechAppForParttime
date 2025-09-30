@@ -6,7 +6,7 @@ import axios from 'axios';
 // Lưu ý: Tôi đã đổi IP cục bộ thành localhost:3001, bạn có thể thay đổi lại
 // thành 'http://192.168.1.28:3001/api' nếu cần.
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:3001/api";
 
 const api = axios.create({
     baseURL: API_BASE_URL

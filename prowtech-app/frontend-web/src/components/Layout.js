@@ -78,9 +78,12 @@ function Layout() {
           <button className="btn-toggle" onClick={toggleSidebar}>
             <FontAwesomeIcon icon={faBars} />
           </button>
-          <div className="topbar-user">
+          <div className="topbar-actions">
             <FontAwesomeIcon icon={faUserCircle} className="user-icon" />
             <span>Hi, {user?.full_name || "Guest"}</span>
+            <button className="btn btn-outline btn-sm" onClick={logout}>
+              Logout
+            </button>
           </div>
         </div>
 
