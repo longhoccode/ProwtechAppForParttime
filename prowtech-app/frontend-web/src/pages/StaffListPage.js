@@ -116,7 +116,7 @@ function StaffListPage() {
               </td>
               <td>{staff.phone_number || "N/A"}</td>
               <td>{staff.tax_id || "N/A"}</td>
-              <td>{staff.bank_account || "N/A"}</td>
+              <td>{staff.bank_account_number || "N/A"}</td>
               <td>{staff.bank_name || "N/A"}</td>
               <td className="table-actions">
                 <button

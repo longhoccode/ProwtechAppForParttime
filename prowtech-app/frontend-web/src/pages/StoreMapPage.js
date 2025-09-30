@@ -150,11 +150,25 @@ function StoreMapPage() {
               position={{ lat: Number(selectedStore.latitude), lng: Number(selectedStore.longitude) }}
               onCloseClick={() => setSelectedStore(null)}
             >
-              <div className="map-popup">
-                <h3>{selectedStore.store_code || selectedStore.name}</h3>
-                <p>{selectedStore.address}</p>
-                <p><b>Board:</b> {selectedStore.board_name}</p>
-              </div>
+            <div className="map-popup">
+              {/* The Store Code as the primary title/identifier */}
+              <h3>{selectedStore.store_code}</h3>
+              
+              {/* Store Details */}
+              <p className="address">{selectedStore.address}</p>
+              <p className="board-name">BOARD: {selectedStore.board_name}</p>
+
+              {/* Corrected Google Maps Link and Button */}
+              <a 
+                href={`https://maps.google.com/?q=${selectedStore.latitude},${selectedStore.longitude}`}
+                target="_blank" 
+                rel="noopener noreferrer"
+                aria-label={`View ${selectedStore.store_code} on Google Maps`}
+                className="btn btn-outline btn-sm"
+              >
+                  View on Google Maps
+              </a>
+            </div>
             </InfoWindow>
           )}
         </GoogleMap>

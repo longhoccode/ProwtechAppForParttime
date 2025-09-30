@@ -11,7 +11,7 @@ function FilterBar({ filters, values, onChange, onReset }) {
             {filter.type === "select" ? (
               <select
                 id={filter.name}
-                className="form-control"
+                className="filter-value"
                 value={values[filter.name] || "all"}
                 onChange={(e) => onChange(filter.name, e.target.value)}
               >
@@ -31,7 +31,7 @@ function FilterBar({ filters, values, onChange, onReset }) {
               <input
                 id={filter.name}
                 type="text"
-                className="form-control"
+                className="filter-value"
                 placeholder={filter.placeholder || ""}
                 value={values[filter.name] || ""}
                 onChange={(e) => onChange(filter.name, e.target.value)}

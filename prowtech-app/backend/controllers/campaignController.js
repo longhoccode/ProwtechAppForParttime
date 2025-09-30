@@ -117,7 +117,7 @@ exports.getCampaignStores = async (req, res) => {
     const { rows } = await db.query(
       `SELECT 
           s.*, 
-          cs.drive_folder_id
+          cs.id_drive_folder
        FROM campaign_stores cs
        JOIN stores s ON s.id = cs.store_id
        WHERE cs.campaign_id = $1
@@ -179,7 +179,7 @@ exports.removeStoreFromCampaign = async (req, res) => {
 exports.getAllCampaignStores = async (req, res) => {
   try {
     const { rows } = await db.query(
-      `SELECT cs.id AS assignment_id, cs.drive_folder_id as link_image, c.id AS campaign_id, c.name AS campaign_name,
+      `SELECT cs.id AS assignment_id, cs.id_drive_folder as link_image, c.id AS campaign_id, c.name AS campaign_name,
               s.id AS store_id, s.store_code, s.board_name
        FROM campaign_stores cs
        JOIN campaigns c ON c.id = cs.campaign_id

@@ -9,10 +9,10 @@ const defaultStaff = {
   id_number: "",
   join_date: "",
   phone_number: "",
-  bank_account: "",
+  bank_account_number: "",
   bank_name: "",
-  id_front_image: "",
-  id_back_image: "",
+  image_front: "",
+  image_back: "",
   is_active: true,
 };
 
@@ -93,9 +93,9 @@ function StaffDetailModal({ isOpen, onClose, onSave, staff }) {
       </div>
 
       <div className="modal-row">
-        <div className="modal-label">Join Date:</div>
+        <div className="modal-label">ID Date:</div>
         <div className="modal-value">
-          <input type="date" name="join_date" value={staffData.join_date} onChange={handleChange} className="form-control" />
+          <input type="date" name="join_date" value={staffData.id_issued_date} onChange={handleChange} className="form-control" />
         </div>
       </div>
 
@@ -109,7 +109,7 @@ function StaffDetailModal({ isOpen, onClose, onSave, staff }) {
       <div className="modal-row">
         <div className="modal-label">Bank Account:</div>
         <div className="modal-value">
-          <input type="text" name="bank_account" value={staffData.bank_account} onChange={handleChange} className="form-control" />
+          <input type="text" name="bank_account" value={staffData.bank_account_number} onChange={handleChange} className="form-control" />
         </div>
       </div>
 
@@ -123,14 +123,14 @@ function StaffDetailModal({ isOpen, onClose, onSave, staff }) {
       <div className="modal-row">
         <div className="modal-label">ID Front Image:</div>
         <div className="modal-value">
-          <input type="text" name="google_token" value={staffData.id_front_image} onChange={handleChange} className="form-control" />
+          <input type="text" name="image_front" value={staffData.image_front} onChange={handleChange} className="form-control" />
         </div>
       </div>
 
       <div className="modal-row">
         <div className="modal-label">ID Back Image:</div>
         <div className="modal-value">
-          <input type="text" name="facebook_token" value={staffData.id_back_image} onChange={handleChange} className="form-control" />
+          <input type="text" name="image_back" value={staffData.image_back} onChange={handleChange} className="form-control" />
         </div>
       </div>
 

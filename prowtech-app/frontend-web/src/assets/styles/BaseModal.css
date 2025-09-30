@@ -1,9 +1,13 @@
-/* src/components/BaseModal.css */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+/* src/components/BaseModal.css - Optimized */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+/* Biến tùy chỉnh (Custom Properties) nên được định nghĩa ở đây hoặc trong một file gốc */
+/* Vd: :root { --border-color: #ccc; --border-radius: 4px; --success: #10b981; --font-sm: 0.875rem; } */
 
 .modal-overlay {
   position: fixed;
-  inset: 0;
+  inset: 0; /* Tối ưu: Ngắn gọn thay cho top/right/bottom/left: 0 */
   background: rgba(0,0,0,0.5);
   display: flex;
   justify-content: center;
@@ -19,10 +23,11 @@
   display: flex;
   flex-direction: column;
   max-width: 50%;
-  height: auto;
+  height: 80%;
+  width: 100%; /* Đảm bảo nó giãn ra trong max-width */
   position: relative;
   box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Roboto', sans-serif;
   overflow: hidden;
   animation: slideIn 0.25s forwards;
 }
@@ -31,7 +36,7 @@
   padding: 16px;
   border-bottom: 1px solid #e5e7eb;
   background: #f9fafb;
-  flex-shrink: 0;
+  flex-shrink: 0; /* Giữ nguyên, rất tốt */
 }
 
 .modal-title {
@@ -42,55 +47,63 @@
 }
 
 .form-control {
-  max-width: 100%;
+  width: 100%; /* Thêm width: 100% để đảm bảo nó lấp đầy container */
   padding: 0.625rem 0.75rem;
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   background: #fff;
   font-size: var(--font-sm);
+  box-sizing: border-box; /* Tối ưu: Đảm bảo padding không làm tăng tổng chiều rộng */
 }
 
 .modal-content {
-  padding: 16px;
+  padding: 16px; 
   display: flex;
+  flex-grow: 1; /* Tối ưu: Thay height: 100% (có thể gây lỗi khi flex) bằng flex-grow: 1 */
   flex-direction: column;
-  justify-content: center;
   gap: 12px;
   overflow-y: auto;
-  min-width: 500px;
 }
 
-.modal-content::-webkit-scrollbar { display: none; }
-
 .modal-row {
-  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
   width: 100%;
-  justify-content: flex-start;
-  height: auto;
 }
 
 .modal-row input[type="checkbox"] {
-  margin-right: 8px;       /* khoảng cách giữa checkbox và text */
-  transform: scale(1.2);   /* phóng to checkbox cho dễ bấm */
+  margin-right: 8px;
+  /* Tối ưu: Giảm kích thước và loại bỏ padding, background-color bất thường */
+  transform: scale(1); /* Bỏ scale(1.2) nếu không cần phóng to */
   cursor: pointer;
-  border-radius: 25px;
+  /* Bỏ border-radius: 25px; vì checkbox thường là hình vuông/tròn nhỏ */
   height: 16px;
-  width: 16px;  
-  background-color: #854d0e;
-  padding: 20px;       /* hiển thị con trỏ bàn tay */
+  width: 16px;
+  /* background-color: #854d0e; ❌ Bỏ, dùng accent-color khi checked */
+  /* padding: 20px; ❌ Bỏ, khiến checkbox bị biến dạng */
 }
 
 .modal-row input[type="checkbox"]:checked {
-  accent-color: var(--success);   /* màu xanh khi chọn (hỗ trợ trên Chrome/Edge/Firefox mới) */
+  accent-color: var(--success, #10b981); /* Sử dụng giá trị dự phòng nếu --success không tồn tại */
 }
 
+.modal-label { 
+  font-weight: 500; 
+  color: #333; 
+  width: 15%;
+  flex-shrink: 0; /* Tối ưu: Ngăn label bị co lại */
+}
+.modal-value { 
+  color: #555; 
+  flex-grow: 1; /* Tối ưu: Cho phép value giãn ra hết không gian còn lại */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 20%;
+}
+#address { width: 50%;} /* Nếu #address là một .modal-value, nên dùng selector mạnh hơn */
 
-.modal-label { font-weight: 500; color: #333; width: 30%; }
-.modal-value { color: #555; align-items: left; }
-#address { width: 50%;}
 .modal-actions {
   padding: 12px 16px;
   border-top: 1px solid #e5e7eb;
@@ -127,14 +140,14 @@
 }
 .modal-close:hover { background: rgba(255,255,255,1); }
 
-/* Scrollbar */
+/* Scrollbar Tùy chỉnh (Chỉ hiển thị nếu bạn KHÔNG dùng display: none ở trên) */
 .modal-content::-webkit-scrollbar { width: 6px; }
 .modal-content::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.2); border-radius: 3px; }
 
 /* Alerts */
 .alert { padding: 8px 12px; border-radius: 4px; font-weight: 500; margin-bottom: 8px; }
 .alert-error { background: #fee2e2; color: #b91c1c; }
-.alert-info  { background: #e0f2fe; color: #0369a1; }
+.alert-info { background: #e0f2fe; color: #0369a1; }
 .alert-warning { background: #fef9c3; color: #854d0e; }
 
 /* Animations */
@@ -145,7 +158,8 @@
 @media(max-width:768px){
   .modal { max-width: 95%; max-height: 95vh; border-radius: 6px; }
   .modal-row { flex-direction: column; align-items: flex-start; gap: 6px; }
-  .modal-label,.modal-value { width: 100%; font-size: 0.85rem; }
+  .modal-label, .modal-value { width: 100%; font-size: 0.85rem; }
+  .modal-label { flex-shrink: unset; } /* Tối ưu: Bỏ flex-shrink: 0 trên mobile */
 }
 @media(max-width:480px){
   .modal-actions { flex-direction: column; gap: 8px; }
