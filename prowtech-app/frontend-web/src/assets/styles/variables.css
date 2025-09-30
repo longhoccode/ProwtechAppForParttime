@@ -1,0 +1,72 @@
+/* ================================
+   Variables và Typography
+================================ */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --primary: #1e1e2f;
+  --secondary: #6c757d;
+  --success: #1aa179;
+  --danger: #e63757;
+  --warning: #f6c343;
+  --info: #2c7be5;
+  --light: #f8f9fa;
+  --dark: #262b40;
+  --border-radius: .375rem;
+  --border-color: #dee2e6;
+  --shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+
+  /* Responsive typography */
+  --font-base: 16px;
+  --font-sm: 14px;
+  --font-md: 16px;
+  --font-lg: 18px;
+  --font-xl: 20px;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  font-size: var(--font-base);
+  line-height: 1.5rem;
+  color: var(--dark);
+  background-color: var(--light);
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: .75rem;
+  line-height: 1.2;
+}
+
+h1 { font-size: 2rem; }
+h2 { font-size: 1.75rem; }
+h3 { font-size: 1.5rem; }
+h4 { font-size: 1.25rem; }
+h5 { font-size: 1rem; }
+h6 { font-size: 0.875rem; }
+
+/* ================================
+   Responsive Typography
+================================ */
+@media (max-width: 768px) {
+  body { font-size: var(--font-sm); line-height: 1.4rem; }
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+  h4 { font-size: 1.125rem; }
+  h5 { font-size: 1rem; }
+  h6 { font-size: 0.875rem; }
+}
+
+@media (max-width: 480px) {
+  body { font-size: 14px; line-height: 1.3rem; }
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+  h3 { font-size: 1.125rem; }
+  h4 { font-size: 1rem; }
+  h5 { font-size: 0.875rem; }
+  h6 { font-size: 0.75rem; }
+}
