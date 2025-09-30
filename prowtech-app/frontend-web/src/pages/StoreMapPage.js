@@ -11,6 +11,7 @@ function StoreMapPage() {
   const [stores, setStores] = useState([]);
   const [campaigns, setCampaigns] = useState([]);
   const [campaignStores, setCampaignStores] = useState([]);
+  const [userLocation, setUserLocation] = useState(null); 
 
   const [selectedStore, setSelectedStore] = useState(null);
 
@@ -28,6 +29,30 @@ function StoreMapPage() {
     id: "google-map-script",
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
   });
+    // EFFECT 1: Lấy Vị trí Người dùng (Geolocation)
+    useEffect(() => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const newLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude,
+                    };
+                    setUserLocation(newLocation);
+                    // Tùy chọn: Dịch chuyển bản đồ đến vị trí người dùng ngay khi tải
+                    if (mapRef.current) {
+                        mapRef.current.setCenter(newLocation);
+                        mapRef.current.setZoom(14); 
+                    }
+                },
+                (error) => {
+                    // Nếu người dùng từ chối hoặc có lỗi, giữ lại DEFAULT_CENTER
+                    console.warn("Geolocation denied or error:", error);
+                },
+                { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+            );
+        }
+    }, [isLoaded]); // Chạy sau khi Maps API được giả định là tải xong
 
   // Fetch data
   useEffect(() => {
@@ -56,7 +81,7 @@ function StoreMapPage() {
     setFilterValues({ board: "all", campaign: "all", district: "all", districtRaw: "all" });
     setSelectedStore(null);
     if (mapRef.current) {
-      mapRef.current.setCenter(DEFAULT_CENTER);
+      mapRef.current.setCenter(userLocation);
       mapRef.current.setZoom(12);
     }
   };
@@ -133,7 +158,7 @@ function StoreMapPage() {
       <div className="map-container">
         <GoogleMap
           mapContainerStyle={MAP_CONTAINER_STYLE}
-          center={DEFAULT_CENTER}
+          center={userLocation}
           zoom={12}
           onLoad={onMapLoad}
         >
