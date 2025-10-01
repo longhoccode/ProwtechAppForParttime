@@ -1,14 +1,19 @@
-// api.js (ĐÃ TỐI ƯU)
-
 import axios from "axios";
 
-// ... Khởi tạo axios instance ...
+const API_BASE_URL =
+  process.env.REACT_APP_API_BASE_URL || "http://localhost:3001/api";
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 // === Request Interceptor: tự động gắn token ===
 api.interceptors.request.use(
   (config) => {
-    // Lấy token từ key "token" đã đồng bộ
-    const token = localStorage.getItem("token"); 
+    const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -23,29 +28,22 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // ⚡️ CHẮC CHẮN: Kiểm tra cả token và refreshToken đều có
+    // Nếu token hết hạn (401) và chưa retry
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
       localStorage.getItem("refreshToken")
     ) {
       originalRequest._retry = true;
-      
-      // Xử lý logic Refresh Token... (Phần này của bạn đã đúng)
       try {
+        // Gọi API refresh token
         const refreshToken = localStorage.getItem("refreshToken");
-        
-        // Dùng axios gốc để tránh bị chặn bởi chính interceptor này
         const res = await axios.post(`${API_BASE_URL}/auth/refresh`, {
           refreshToken,
         });
 
         const newToken = res.data.token;
-        const newRefreshToken = res.data.refreshToken || refreshToken; // Nếu backend trả về refreshToken mới
-        
-        // ⚡️ LƯU TRỮ TOKEN MỚI
         localStorage.setItem("token", newToken);
-        localStorage.setItem("refreshToken", newRefreshToken); 
 
         // Gắn token mới vào headers và retry request cũ
         api.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
@@ -55,11 +53,7 @@ api.interceptors.response.use(
         // Nếu refresh thất bại -> logout
         localStorage.removeItem("token");
         localStorage.removeItem("refreshToken");
-        // Xóa thông tin user nếu bạn lưu riêng (ví dụ: localStorage.removeItem("user_details"))
-        
-        // ⚡️ CẦN THIẾT: Chuyển hướng người dùng
         window.location.href = "/login";
-        return Promise.reject(refreshError);
       }
     }
 
