@@ -17,7 +17,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // xử lý preflight
+app.options("(.*)", cors(corsOptions)); // xử lý preflight với path-to-regexp mới
 
 app.use(express.json());
 
