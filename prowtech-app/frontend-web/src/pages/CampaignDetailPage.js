@@ -1,3 +1,4 @@
+// File: CampaignDetailPage.jsx
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
@@ -9,7 +10,6 @@ import DataTable from '../components/DataTable';
 import FilterBar from '../components/FilterBar';
 import { provinces, districtMap } from '../constants/locationData';
 
-
 function CampaignDetailPage() {
   const { id } = useParams();
   const [campaign, setCampaign] = useState(null);
@@ -20,6 +20,7 @@ function CampaignDetailPage() {
 
   // Filter state
   const [filters, setFilters] = useState({
+    board: 'all',
     province: '',
     district: '',
     search: '',
@@ -54,18 +55,48 @@ function CampaignDetailPage() {
   // District options based on selected province
   const districtOptions = filters.province ? districtMap[filters.province] || [] : [];
 
+  // Board options
+  const boardOptions = useMemo(
+    () => [...new Set(assignedStores.map((s) => s.board_name))].sort(),
+    [assignedStores]
+  );
+
   // Filtered stores
   const filteredStores = useMemo(() => {
     return assignedStores.filter((store) => {
+      const boardMatch = filters.board === 'all' || store.board_name === filters.board;
       const matchProvince = filters.province ? store.district === filters.province : true;
       const matchDistrict = filters.district ? store.district_raw === filters.district : true;
       const matchSearch =
         (store.board_name || '').toLowerCase().includes(filters.search.toLowerCase()) ||
         (store.store_code || '').toLowerCase().includes(filters.search.toLowerCase()) ||
         (store.address || '').toLowerCase().includes(filters.search.toLowerCase());
-      return matchProvince && matchDistrict && matchSearch;
+      return boardMatch && matchProvince && matchDistrict && matchSearch;
     });
   }, [assignedStores, filters]);
+
+  // State cho loading riêng từng nút (tùy chọn)
+  const [updatingIds, setUpdatingIds] = useState([]);
+
+  const toggleDone = async (campaignStoreId, currentDone) => {
+    setUpdatingIds((prev) => [...prev, campaignStoreId]);
+    try {
+      const res = await api.patch(`/campaigns/${id}/stores/${campaignStoreId}`);
+      const updated = res.data.data;
+
+      // ✅ Cập nhật local state luôn, không gọi fetchData()
+      setAssignedStores((prev) =>
+        prev.map((s) =>
+          s.campaign_store_id === campaignStoreId ? { ...s, is_done: updated.is_done } : s
+        )
+      );
+    } catch (err) {
+      console.error("Failed to update is_done:", err);
+    } finally {
+      setUpdatingIds((prev) => prev.filter((sid) => sid !== campaignStoreId));
+    }
+  };
+
 
   if (loading) return <LoadingMessage text="Đang tải chiến dịch..." />;
   if (error) return <ErrorMessage text={error} />;
@@ -73,11 +104,14 @@ function CampaignDetailPage() {
 
   return (
     <div className="container detail-page">
-      <Link to="/campaigns" className="btn btn-outline btn-sm link"  style={{maxWidth: "fit-content"}}>
-          &larr; Quay lại danh sách
+      <Link to="/campaigns" className="btn btn-outline btn-sm link" style={{ maxWidth: 'fit-content' }}>
+        &larr; Quay lại danh sách
       </Link>
+
       <div className="page-header">
-        <h2 className="page-title">Cửa hàng ({assignedStores.length})</h2>
+        <h2 className="page-title">
+          {campaign.name} Cửa hàng ({assignedStores.length})
+        </h2>
         <button className="btn btn-primary btn-sm" onClick={() => setIsModalOpen(true)}>
           Quản lý cửa hàng
         </button>
@@ -86,6 +120,12 @@ function CampaignDetailPage() {
       {/* FilterBar */}
       <FilterBar
         filters={[
+          {
+            name: 'board',
+            type: 'select',
+            label: 'Chain',
+            options: [{ value: 'all', label: 'Tất cả' }, ...boardOptions.map(b => ({ value: b, label: b }))],
+          },
           {
             name: 'province',
             type: 'select',
@@ -120,21 +160,24 @@ function CampaignDetailPage() {
         <DataTable
           columns={[
             { label: 'Store Code' },
+            { label: 'Board' },
             { label: 'Address' },
             { label: 'District' },
-            { label: 'Link Drive' }, // thêm cột mới
+            { label: 'Drive Link' },
+            { label: 'Done', className: 'table-actions' },
           ]}
           data={filteredStores}
           renderRow={(store) => (
             <tr key={store.id}>
               <td>{store.store_code}</td>
+              <td>{store.board_name}</td>
               <td id="address">{store.address}</td>
               <td>
                 {districtMap[store.district]?.find((d) => d.value === store.district_raw)?.label ||
                   store.district_raw}
               </td>
               <td>
-                {store.drive_folder_id? (
+                {store.drive_folder_id ? (
                   <a
                     href={store.drive_folder_id}
                     target="_blank"
@@ -146,6 +189,17 @@ function CampaignDetailPage() {
                 ) : (
                   <span className="text-gray-400">Chưa có</span>
                 )}
+              </td>
+              <td className='table-actions'>
+                <button
+                  className={`btn btn-sm ${store.is_done ? 'btn-success' : 'btn-outline'}`}
+                  onClick={() => toggleDone(store.campaign_store_id, store.is_done)}
+                  disabled={updatingIds.includes(store.campaign_store_id)}
+                >
+                  {updatingIds.includes(store.campaign_store_id) ? (
+                    <span className="loading loading-spinner loading-xs"></span>
+                  ) : store.is_done ? 'Done' : 'Chưa Done'}
+                </button>
               </td>
             </tr>
           )}
@@ -160,7 +214,7 @@ function CampaignDetailPage() {
         onClose={() => setIsModalOpen(false)}
         onSave={handleSaveStores}
         campaignId={id}
-        initiallyAssignedIds={assignedStores.map((s) => s.id)}
+        initiallyAssignedIds={assignedStores.map((s) => s.store_id)} // ✅ store_id
       />
     </div>
   );

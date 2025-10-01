@@ -11,40 +11,42 @@ const {
   getCampaignStores,
   addStoreToCampaign,
   removeStoreFromCampaign,
-  getAllCampaignStores,      // ✅ đổi tên cho rõ nghĩa
+  getAllCampaignStores,
   bulkUpdateStoresInCampaign,
+  updateStoreDoneStatus, // PATCH is_done
 } = require('../controllers/campaignController');
 
 const { protect, authorize } = require('../middleware/authMiddleware');
 
-// Áp dụng middleware cho toàn bộ route
+// Middleware áp dụng cho toàn bộ route
 router.use(protect);
-router.use(authorize('admin','parttime'));
+router.use(authorize('admin', 'parttime'));
 
-// --- Routes cho Campaign-Store Mapping ---
-// Lấy toàn bộ mapping giữa campaign và store
+// === Campaign-Store mapping ===
 router.route('/campaign-stores')
-  .get(getAllCampaignStores);
+  .get(getAllCampaignStores); // GET tất cả mapping
 
-// --- Routes cho Campaigns ---
+// === Campaigns ===
 router.route('/')
-  .get(getAllCampaigns)     // GET /api/campaigns
-  .post(createCampaign);    // POST /api/campaigns
+  .get(getAllCampaigns)
+  .post(createCampaign);
 
 router.route('/:id')
-  .get(getCampaignById)     // GET /api/campaigns/:id
-  .put(updateCampaign)      // PUT /api/campaigns/:id
-  .delete(deleteCampaign);  // DELETE /api/campaigns/:id
+  .get(getCampaignById)
+  .put(updateCampaign)
+  .delete(deleteCampaign);
 
-// --- Routes cho Stores trong Campaign ---
+// === Stores trong Campaign ===
 router.route('/:id/stores')
-  .get(getCampaignStores)      // GET /api/campaigns/:id/stores
-  .post(addStoreToCampaign);   // POST /api/campaigns/:id/stores
+  .get(getCampaignStores)       // Lấy danh sách store của campaign
+  .post(addStoreToCampaign);    // Thêm 1 store vào campaign
 
 router.route('/:id/stores/bulk')
-  .post(bulkUpdateStoresInCampaign); // POST /api/campaigns/:id/stores/bulk
+  .post(bulkUpdateStoresInCampaign); // Thêm/xóa nhiều store cùng lúc
 
-router.route('/:id/stores/:storeId')
-  .delete(removeStoreFromCampaign);  // DELETE /api/campaigns/:id/stores/:storeId
+router.route('/:campaignId/stores/:campaignStoreId')
+  .patch(updateStoreDoneStatus)
+  .delete(removeStoreFromCampaign);  // DELETE để xóa store khỏi campaign
+
 
 module.exports = router;
