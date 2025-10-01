@@ -2,9 +2,9 @@ import React, { memo, useState, useMemo, useRef, useEffect } from "react";
 import { GoogleMap, useJsApiLoader, InfoWindow, Marker } from "@react-google-maps/api";
 import FilterBar from "../components/FilterBar";
 import api from "../services/api";
+import StoreCount from "../components/StoreCount";
 import { provinces, districtMap } from "../constants/locationData";
 
-const DEFAULT_CENTER = { lat: 10.7769, lng: 106.7009 };
 const MAP_CONTAINER_STYLE = { width: "100%", height: "100%", borderRadius: "8px" };
 
 function StoreMapPage() {
@@ -161,6 +161,11 @@ function StoreMapPage() {
 
       <FilterBar filters={filters} values={filterValues} onChange={handleFilterChange} />
       <button className="btn btn-primary btn-lg mt-2" onClick={handleReset}>Reset</button>
+      
+      {/* Store count */}
+      <div style={{ margin: "0.5rem 0",}} className="desktop-only">
+        <StoreCount count={filteredStores.length} />
+      </div>
 
       <div className="map-container">
         <GoogleMap

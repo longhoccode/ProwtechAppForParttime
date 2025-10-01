@@ -33,7 +33,7 @@ exports.createStaff = async (req, res) => {
     try {
         const fields = [
             'full_name', 'day_of_birth', 'gender', 'address', 'id_number',
-            'id_issued_date', 'tax_id', 'phone_number', 'bank_account', 'bank_name',
+            'id_issued_date', 'tax_id', 'phone_number', 'bank_account_number', 'bank_name',
             'image_front', 'image_back'
         ];
 
@@ -60,7 +60,7 @@ exports.updateStaff = async (req, res) => {
         const { id } = req.params;
         const fields = [
             'full_name', 'day_of_birth', 'gender', 'address', 'id_number',
-            'id_issued_date', 'tax_id', 'phone_number', 'bank_account', 'bank_name',
+            'id_issued_date', 'tax_id', 'phone_number', 'bank_account_number', 'bank_name',
             'image_front', 'image_back'
         ];
 

@@ -21,7 +21,7 @@ function BaseModal({ isOpen, onClose, title, children, actions }) {
 
         <div className="modal-content">{children}</div>
 
-        {actions && <div className="modal-actions">{actions}</div>}
+        {actions && <div className="modal-actions-box">{actions}</div>}
       </div>
     </div>,
     document.body

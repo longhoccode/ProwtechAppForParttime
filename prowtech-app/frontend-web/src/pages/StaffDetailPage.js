@@ -45,7 +45,7 @@ function StaffDetailPage() {
 
   return (
     <div className="container">
-      <Link to="/staffs" className="btn btn-outline btn-sm link">
+      <Link to="/staffs" className="btn btn-outline btn-sm link"  style={{maxWidth: "fit-content"}}>
         &larr; Quay lại danh sách nhân viên
       </Link>
 

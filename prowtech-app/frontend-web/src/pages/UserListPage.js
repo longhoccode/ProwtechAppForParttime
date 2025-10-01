@@ -18,6 +18,8 @@ function UserListPage() {
   // filter state
   const [filters, setFilters] = useState({ role: "", search: "" });
 
+  const safeData = (resp) => resp?.data?.data ?? resp?.data ?? resp;
+
   const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
@@ -50,13 +52,16 @@ function UserListPage() {
       if (userData.id) {
         const { id, ...updateData } = userData;
         const response = await api.put(`/users/${id}`, updateData);
-        setUsers((prev) => prev.map((u) => (u.id === id ? response.data.data : u)));
+        const updated = safeData(response);
+        setUsers((prev) => prev.map((u) => (u.id === id ? updated : u)));
       } else {
         const response = await api.post("/users", userData);
-        setUsers((prev) => [response.data.data, ...prev]);
+        const created = safeData(response);
+        setUsers((prev) => [created, ...prev]);
       }
       setIsModalOpen(false);
-    } catch {
+    } catch (err) {
+      console.error(err);
       setError(userData.id ? "Failed to update user." : "Failed to create user.");
     }
   };
@@ -72,14 +77,32 @@ function UserListPage() {
     }
   };
 
+  const handleDeleteUser = async (user) => {
+    if (!window.confirm(`Delete ${user.full_name}?`)) return;
+    try {
+      // Nếu muốn gửi body với axios.delete: await api.delete(`/users/${user.id}`, { data: deletedUser })
+      await api.delete(`/users/${user.id}`);
+      // remove user from local state
+      setUsers((prev) => prev.filter((u) => u.id !== user.id));
+    } catch (err) {
+      console.error(err);
+      setError("Failed to delete user.");
+    }
+  };
+
+
   // filter logic
-  const filteredUsers = users.filter((user) => {
-    const matchRole = filters.role ? user.role === filters.role : true;
-    const matchSearch =
-      user.full_name.toLowerCase().includes(filters.search.toLowerCase()) ||
-      user.email.toLowerCase().includes(filters.search.toLowerCase());
-    return matchRole && matchSearch;
-  });
+  const filteredUsers = users
+    .filter(Boolean) // loại bỏ null/undefined
+    .filter((user) => {
+      const matchRole = filters.role ? user.role === filters.role : true;
+      const searchLower = (filters.search || "").toLowerCase();
+      const matchSearch =
+        (user.full_name || "").toLowerCase().includes(searchLower) ||
+        (user.email || "").toLowerCase().includes(searchLower);
+      return matchRole && matchSearch;
+    });
+
 
   return (
     <div className="container">
@@ -156,6 +179,12 @@ function UserListPage() {
                     Deactivate
                   </button>
                 )}
+                <button
+                  className="btn btn-warning btn-sm"
+                  onClick={() => handleDeleteUser(user)}
+                >
+                  Detele
+                </button>
               </td>
             </tr>
           )}

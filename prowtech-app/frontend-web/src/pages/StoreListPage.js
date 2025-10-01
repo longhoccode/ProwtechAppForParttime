@@ -6,6 +6,7 @@ import DataTable from "../components/DataTable";
 import LoadingMessage from "../components/LoadingMessage";
 import ErrorMessage from "../components/ErrorMessage";
 import FilterBar from "../components/FilterBar";
+import StoreCount from "../components/StoreCount";
 import { provinces, districtMap } from "../constants/locationData";
 
 function StoreListPage() {
@@ -15,8 +16,8 @@ function StoreListPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedStore, setSelectedStore] = useState(null);
 
-  // Filter state
   const [filters, setFilters] = useState({
+    board: "all",
     province: "",
     district: "",
     search: "",
@@ -28,7 +29,7 @@ function StoreListPage() {
       setLoading(true);
       setError("");
       const response = await api.get("/stores");
-      setStores(response.data.data);
+      setStores(response.data.data || []);
     } catch (err) {
       console.error("❌ Fetch stores error:", err);
       setError("Failed to fetch stores.");
@@ -49,16 +50,25 @@ function StoreListPage() {
   // District options based on selected province
   const districtOptions = filters.province ? districtMap[filters.province] || [] : [];
 
+  // Board options
+  const boardOptions = useMemo(
+    () => [...new Set(stores.map((s) => s.board_name))].sort(),
+    [stores]
+  );
+
   // Filtered stores
   const filteredStores = useMemo(() => {
     return stores.filter((store) => {
+      const boardMatch = filters.board === "all" || store.board_name === filters.board;
       const matchProvince = filters.province ? store.district === filters.province : true;
-      const matchDistrict = filters.district ? store.district_raw === filters.district : true;
+      const matchDistrict = filters.district
+        ? store.district_raw === filters.district
+        : true;
       const matchSearch =
         (store.board_name || "").toLowerCase().includes(filters.search.toLowerCase()) ||
         (store.store_code || "").toLowerCase().includes(filters.search.toLowerCase()) ||
         (store.address || "").toLowerCase().includes(filters.search.toLowerCase());
-      return matchProvince && matchDistrict && matchSearch;
+      return boardMatch && matchProvince && matchDistrict && matchSearch;
     });
   }, [stores, filters]);
 
@@ -71,6 +81,12 @@ function StoreListPage() {
       {/* FilterBar */}
       <FilterBar
         filters={[
+          {
+            name: "board",
+            label: "Chain",
+            type: "select",
+            options: [{ value: "all", label: "Tất cả" }, ...boardOptions.map(b => ({ value: b, label: b }))],
+          },
           {
             name: "province",
             type: "select",
@@ -100,8 +116,13 @@ function StoreListPage() {
         }
       />
 
+      {/* Store count */}
+      <div style={{ margin: "0.5rem 0" }}>
+        <StoreCount count={filteredStores.length} />
+      </div>
+
       {loading && <LoadingMessage message="Loading stores..." />}
-      <ErrorMessage message={error} />
+      {error && <ErrorMessage message={error} />}
 
       {!loading && !error && (
         <DataTable
@@ -120,8 +141,11 @@ function StoreListPage() {
               <td>{store.board_name}</td>
               <td>{store.store_code}</td>
               <td id="address">{store.address}</td>
-              <td>{districtMap[store.district]?.find((d) => d.value === store.district_raw)?.label || store.district_raw}</td>
-              <td>{store.district}</td>             
+              <td>
+                {districtMap[store.district]?.find((d) => d.value === store.district_raw)?.label ||
+                  store.district_raw}
+              </td>
+              <td>{store.district}</td>
               <td>
                 <span className={`badge ${store.is_active ? "badge-success" : "badge-error"}`}>
                   {store.is_active ? "Active" : "Inactive"}

@@ -51,7 +51,7 @@ exports.updateUser = async (req, res) => {
 
 // POST /api/users -> Admin tạo người dùng mới
 exports.createUser = async (req, res) => {
-    const { full_name, email, password, phone_number, role } = req.body;
+    const { full_name, email, password, phone_number, role, is_active } = req.body;
 
     if (!full_name || !email || !password || !role) {
         return res.status(400).json({ success: false, message: 'Please provide all required fields.' });
@@ -62,10 +62,10 @@ exports.createUser = async (req, res) => {
         const password_hash = await bcrypt.hash(password, salt);
 
         const queryText = `
-            INSERT INTO users(full_name, email, password_hash, phone_number, role)
-            VALUES($1, $2, $3, $4, $5) RETURNING id, full_name, email, role, created_at
+            INSERT INTO users(full_name, email, password_hash, phone_number, role, is_active)
+            VALUES($1, $2, $3, $4, $5, $6) RETURNING id, full_name, email, role, is_active, created_at
         `;
-        const values = [full_name, email, password_hash, phone_number, role];
+        const values = [full_name, email, password_hash, phone_number, role, is_active];
 
         const { rows } = await db.query(queryText, values);
         res.status(201).json({ success: true, data: rows[0] });

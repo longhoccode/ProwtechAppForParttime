@@ -73,7 +73,7 @@ function CampaignDetailPage() {
 
   return (
     <div className="container detail-page">
-      <Link to="/campaigns" className="btn btn-outline btn-sm link">
+      <Link to="/campaigns" className="btn btn-outline btn-sm link"  style={{maxWidth: "fit-content"}}>
           &larr; Quay lại danh sách
       </Link>
       <div className="page-header">
