@@ -1,22 +1,30 @@
+// authService.js (ĐÃ CẬP NHẬT)
+
 import api from './api';
 
 // Gọi API login
 export const loginService = async (credentials) => {
   const response = await api.post('/auth/login', credentials);
-  return response.data; // { user, token }
+  const { user, token, refreshToken } = response.data;
+  
+  // ⚡️ THÊM: Lưu refreshToken vào localStorage
+  localStorage.setItem("token", token);
+  localStorage.setItem("refreshToken", refreshToken);
+
+  return { user, token }; // Trả về user và access token
 };
 
-// Gọi API logout (nếu backend có endpoint logout)
+// Gọi API logout
 export const logoutService = async () => {
   try {
-    await api.post('/auth/logout');
+    // ⚡️ THÊM: Có thể gọi API logout để invalidate refreshToken trên server
+    await api.post('/auth/logout'); 
   } catch (error) {
     console.warn("Logout API failed:", error);
+  } finally {
+    // ⚡️ THÊM: Xóa token và refreshToken khỏi localStorage
+    localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
   }
 };
 
-// Gọi API để load profile từ token (optional)
-export const getProfileService = async () => {
-  const response = await api.get('/auth/profile');
-  return response.data; // { user }
-};

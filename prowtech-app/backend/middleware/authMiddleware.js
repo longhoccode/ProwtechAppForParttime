@@ -41,6 +41,11 @@ exports.protect = async (req, res, next) => {
 
   } catch (error) {
     console.error('Protect middleware error:', error);
+
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({ success: false, message: 'Token expired' });
+    }
+
     return res.status(401).json({ success: false, message: 'Not authorized, token failed' });
   }
 };
@@ -62,6 +67,7 @@ exports.authorize = (...roles) => {
       });
     }
 
+    // Kiểm tra xem role của user có nằm trong roles được phép không
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
