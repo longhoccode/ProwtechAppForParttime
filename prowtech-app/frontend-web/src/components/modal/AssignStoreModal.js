@@ -12,7 +12,7 @@ function AssignStoreModal({ isOpen, onClose, onSave, campaignId, initiallyAssign
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const [filters, setFilters] = useState({ province: "all", district: "", search: "" });
+  const [filters, setFilters] = useState({ province: "all", district: "", search: "", board: "" });
 
   useEffect(() => {
     if (isOpen) {
@@ -84,21 +84,31 @@ function AssignStoreModal({ isOpen, onClose, onSave, campaignId, initiallyAssign
   const districtOptions =
     filters.province && filters.province !== "all" ? districtMap[filters.province] || [] : [];
 
+  const boardOptions = useMemo(() => {
+    const names = Array.from(new Set(allStores.map((s) => s.board_name).filter(Boolean)));
+    return [{ value: "", label: "Tất cả" }, ...names.map((name) => ({ value: name, label: name }))];
+  }, [allStores]);
+
+
   const filterConfig = [
     { name: "search", label: "Tìm kiếm", type: "text", placeholder: "Mã, tên hoặc địa chỉ..." },
     { name: "province", label: "Tỉnh/Thành phố", type: "select", options: [{ value: "all", label: "Tất cả" }, ...provinces] },
     { name: "district", label: "Quận/Huyện", type: "select", options: [{ value: "", label: "Tất cả" }, ...districtOptions] },
+    { name: "board", label: "Board", type: "select", options: boardOptions },
   ];
+
 
   const filteredStores = useMemo(() => {
     return allStores.filter((store) => {
       const matchProvince = filters.province === "all" || store.district === filters.province;
       const matchDistrict = filters.district ? store.district_raw === filters.district : true;
+      const matchBoard = filters.board ? store.board_name === filters.board : true;
       const text = `${store.board_name || ""} ${store.store_code || ""} ${store.address || ""}`.toLowerCase();
       const matchSearch = text.includes(filters.search.toLowerCase());
-      return matchProvince && matchDistrict && matchSearch;
+      return matchProvince && matchDistrict && matchBoard && matchSearch;
     });
   }, [allStores, filters]);
+
 
   return (
     <BaseModal
