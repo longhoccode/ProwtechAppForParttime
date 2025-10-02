@@ -1,9 +1,6 @@
-// AuthContext.js (Phiên bản đã cập nhật)
 
 import React, { createContext, useContext, useState, useEffect, useMemo } from "react";
-// Giả định bạn có authService.js (chứa loginService, logoutService)
 import { loginService, logoutService } from "../services/authService"; 
-import api from "../services/api";
 
 const AuthContext = createContext();
 

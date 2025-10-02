@@ -219,7 +219,7 @@ function StoreMapPage() {
               <Marker
                 key={store.id}
                 position={{ lat: Number(store.latitude), lng: Number(store.longitude) }}
-                icon={{ url: iconUrl, scaledSize: new window.google.maps.Size(24, 24) }}
+                icon={{ url: iconUrl, scaledSize: new window.google.maps.Size(36, 36) }}
                 onClick={() => setSelectedStore(store)}
               />
             );
