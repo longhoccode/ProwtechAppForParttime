@@ -7,6 +7,7 @@ import api from "../services/api";
 import { provinces, districtMap } from "../constants/locationData";
 
 const MAP_CONTAINER_STYLE = { width: "100%", height: "100%", borderRadius: "8px" };
+const DEFAULT_CENTER = { lat: 10.7769, lng: 106.7009 }; // TP. HCM
 
 function StoreMapPage() {
   const [stores, setStores] = useState([]);
@@ -218,7 +219,7 @@ function StoreMapPage() {
             return (
               <Marker
                 key={store.id}
-                position={{ lat: Number(store.latitude), lng: Number(store.longitude) }}
+                position={{ lat: Number(store.latitude), lng: Number(store.longitude)  || DEFAULT_CENTER}}
                 icon={{ url: iconUrl, scaledSize: new window.google.maps.Size(36, 36) }}
                 onClick={() => setSelectedStore(store)}
               />
