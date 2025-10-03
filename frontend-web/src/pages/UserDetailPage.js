@@ -52,7 +52,7 @@ function UserDetailPage() {
 
   return (
     <div className="container">
-      <Link to="/campaigns" className="btn btn-outline btn-sm link">
+      <Link to="/campaigns" className="btn btn-outline btn-sm link" style={{maxWidth: "fit-content"}}>
         &larr; Quay lại danh sách chiến dịch
       </Link>
 

@@ -7,6 +7,7 @@ import LoadingMessage from "../components/LoadingMessage";
 import ErrorMessage from "../components/ErrorMessage";
 import DataTable from "../components/DataTable";
 import FilterBar from "../components/FilterBar";
+import Clock from "../components/Clock";
 
 function CampaignListPage() {
   const [campaigns, setCampaigns] = useState([]);
@@ -76,18 +77,23 @@ function CampaignListPage() {
     }
   };
 
-  // Delete
+  // Delete campaign
   const handleDeleteCampaign = async (campaign) => {
-    if (
-      window.confirm(`Are you sure you want to delete campaign "${campaign.name}"?`)
-    ) {
-      try {
-        await api.delete(`/campaigns/${campaign.id}`);
-        setCampaigns((prev) => prev.filter((c) => c.id !== campaign.id));
-      } catch (err) {
-        console.error("❌ Delete campaign error:", err);
-        setError("Failed to delete campaign.");
-      }
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete campaign "${campaign.name}"?`
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      // Gọi API xóa
+      await api.delete(`/campaigns/${campaign.id}`);
+
+      // Cập nhật lại state campaigns
+      setCampaigns((prev) => prev.filter((c) => c.id !== campaign.id));
+    } catch (err) {
+      console.error("❌ Delete campaign error:", err);
+      setError("Failed to delete campaign.");
     }
   };
 
@@ -140,6 +146,9 @@ function CampaignListPage() {
         values={filters}
         onChange={(name, value) => setFilters((prev) => ({ ...prev, [name]: value }))}
       />
+      <div>
+        <Clock />
+      </div>
 
       {/* Loading & Error */}
       {loading && <LoadingMessage message="Loading campaigns..." />}
@@ -153,6 +162,7 @@ function CampaignListPage() {
             { label: "Description" },
             { label: "Start Date" },
             { label: "End Date" },
+            { label: "Created By" },
             { label: "Status" },
             { label: "Actions", className: "actions-header" },
           ]}
@@ -169,13 +179,14 @@ function CampaignListPage() {
               </td>
               <td>{new Date(campaign.start_date).toLocaleDateString("vi-VN")}</td>
               <td>{new Date(campaign.end_date).toLocaleDateString("vi-VN")}</td>
+              <td>{campaign.created_by_name}</td>
               <td>
                 <span
-                  className={`status ${
-                    campaign.is_active ? "status-active" : "status-inactive"
+                  className={`badge ${
+                    campaign.is_done ? "badge-info" : "badge-success"
                   }`}
                 >
-                  {campaign.is_active ? "Active" : "Inactive"}
+                  {campaign.is_done ? "Completed" : "Running"}
                 </span>
               </td>
               <td>

@@ -39,12 +39,15 @@ function FilterBar({ filters, values, onChange, onReset }) {
             ) : null}
           </div>
         ))}
+        <div className="filter-item">
+          {onReset && (
+            <button className="btn btn-primary btn-lg" onClick={onReset} style={{ marginLeft: "8px"}}>
+              Reset Filter
+            </button>
+          )}
+        </div>
       </div>
-      {onReset && (
-        <button className="btn btn-primary btn-lg" onClick={onReset}>
-          Reset
-        </button>
-      )}
+
     </div>
   );
 }
